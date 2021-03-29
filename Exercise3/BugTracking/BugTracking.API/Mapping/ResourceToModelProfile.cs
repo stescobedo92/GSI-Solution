@@ -12,7 +12,7 @@ namespace BugTracking.API.Mapping
             CreateMap<SaveUserResource, User>();
             CreateMap<SaveProjectResource, Project>();
             CreateMap<SaveBugResource, Bug>();
-            CreateMap<UsersQueryResource, UserQuery>();
+            CreateMap<UserQueryResource, UserQuery>();
             CreateMap<ProjectQueryResource, ProjectQuery>();
             CreateMap<BugQueryResource, BugQuery>();
         }
