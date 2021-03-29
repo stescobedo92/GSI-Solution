@@ -54,31 +54,31 @@ namespace BugTracking.API.Controllers.Config
                 return BadRequest(new ErrorResource(result.Message));
             }
 
-            var categoryResource = _mapper.Map<User, UserResource>(result.Resource);
-            return Ok(categoryResource);
+            var userResource = _mapper.Map<User, UserResource>(result.Resource);
+            return Ok(userResource);
         }
 
         /// <summary>
         /// Updates an existing user according to an identifier.
         /// </summary>
-        /// <param name="id">Category identifier.</param>
-        /// <param name="resource">Updated category data.</param>
+        /// <param name="id">User identifier.</param>
+        /// <param name="resource">Updated user data.</param>
         /// <returns>Response for the request.</returns>
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(UserResource), 200)]
         [ProducesResponseType(typeof(ErrorResource), 400)]
         public async Task<IActionResult> PutAsync(int id, [FromBody] SaveUserResource resource)
         {
-            var category = _mapper.Map<SaveUserResource, User>(resource);
-            var result = await _mapper.UpdateAsync(id, category);
+            var user = _mapper.Map<SaveUserResource, User>(resource);
+            var result = await _userService.UpdateAsync(id, user);
 
             if (!result.Success)
             {
                 return BadRequest(new ErrorResource(result.Message));
             }
 
-            var categoryResource = _mapper.Map<User, UserResource>(result.Resource);
-            return Ok(categoryResource);
+            var userResource = _mapper.Map<User, UserResource>(result.Resource);
+            return Ok(userResource);
         }
 
         /// <summary>
@@ -98,8 +98,8 @@ namespace BugTracking.API.Controllers.Config
                 return BadRequest(new ErrorResource(result.Message));
             }
 
-            var categoryResource = _mapper.Map<User, UserResource>(result.Resource);
-            return Ok(categoryResource);
+            var userResource = _mapper.Map<User, UserResource>(result.Resource);
+            return Ok(userResource);
         }
     }
 }
