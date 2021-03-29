@@ -1,0 +1,105 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using AutoMapper;
+using BugTracking.API.Domain.Models;
+using BugTracking.API.Domain.Services;
+using BugTracking.API.Resources;
+using Microsoft.AspNetCore.Mvc;
+
+namespace BugTracking.API.Controllers.Config
+{
+    [Route("/api/users")]
+    [Produces("application/json")]
+    [ApiController]
+    public class UserController : Controller
+    {
+        private readonly IUserService _userService;
+        private readonly IMapper _mapper;
+
+        public UserController(IUserService userService, IMapper mapper)
+        {
+            _userService = userService;
+            _mapper = mapper;
+        }
+
+        /// <summary>
+        /// Lists all users.
+        /// </summary>
+        /// <returns>List of users.</returns>
+        [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<UserResource>), 200)]
+        public async Task<IEnumerable<UserResource>> ListAsync()
+        {
+            var users = await _userService.ListAsync();
+            var resources = _mapper.Map<IEnumerable<User>, IEnumerable<UserResource>>(users);
+
+            return resources;
+        }
+
+        /// <summary>
+        /// Saves a new user.
+        /// </summary>
+        /// <param name="resource">User data.</param>
+        /// <returns>Response for the request.</returns>
+        [HttpPost]
+        [ProducesResponseType(typeof(UserResource), 201)]
+        [ProducesResponseType(typeof(ErrorResource), 400)]
+        public async Task<IActionResult> PostAsync([FromBody] SaveUserResource resource)
+        {
+            var user = _mapper.Map<SaveUserResource, User>(resource);
+            var result = await _userService.SaveAsync(user);
+
+            if (!result.Success)
+            {
+                return BadRequest(new ErrorResource(result.Message));
+            }
+
+            var categoryResource = _mapper.Map<User, UserResource>(result.Resource);
+            return Ok(categoryResource);
+        }
+
+        /// <summary>
+        /// Updates an existing user according to an identifier.
+        /// </summary>
+        /// <param name="id">Category identifier.</param>
+        /// <param name="resource">Updated category data.</param>
+        /// <returns>Response for the request.</returns>
+        [HttpPut("{id}")]
+        [ProducesResponseType(typeof(UserResource), 200)]
+        [ProducesResponseType(typeof(ErrorResource), 400)]
+        public async Task<IActionResult> PutAsync(int id, [FromBody] SaveUserResource resource)
+        {
+            var category = _mapper.Map<SaveUserResource, User>(resource);
+            var result = await _mapper.UpdateAsync(id, category);
+
+            if (!result.Success)
+            {
+                return BadRequest(new ErrorResource(result.Message));
+            }
+
+            var categoryResource = _mapper.Map<User, UserResource>(result.Resource);
+            return Ok(categoryResource);
+        }
+
+        /// <summary>
+        /// Deletes a given user according to an identifier.
+        /// </summary>
+        /// <param name="id">User identifier.</param>
+        /// <returns>Response for the request.</returns>
+        [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(UserResource), 200)]
+        [ProducesResponseType(typeof(ErrorResource), 400)]
+        public async Task<IActionResult> DeleteAsync(int id)
+        {
+            var result = await _userService.DeleteAsync(id);
+
+            if (!result.Success)
+            {
+                return BadRequest(new ErrorResource(result.Message));
+            }
+
+            var categoryResource = _mapper.Map<User, UserResource>(result.Resource);
+            return Ok(categoryResource);
+        }
+    }
+}
