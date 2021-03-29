@@ -1,4 +1,5 @@
 using BugTracking.API.Extensions;
+using BugTracking.API.Resources;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BugTracking.API.Controllers.Config
