@@ -2,10 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BugTracking.API.Controllers.Config;
+using BugTracking.API.Domain.Repositories;
+using BugTracking.API.Extensions;
+using BugTracking.API.Persistence.Contexts;
+using BugTracking.API.Persistence.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -32,6 +38,26 @@ namespace BugTracking.API
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "BugTracking.API", Version = "v1" });
             });
+
+            services.AddMemoryCache();
+
+            services.AddCustomSwagger();
+
+            services.AddControllers().ConfigureApiBehaviorOptions(options =>
+            {
+                // Adds a custom error response factory when ModelState is invalid
+                options.InvalidModelStateResponseFactory = InvalidModelStateResponseFactory.ProduceErrorResponse;
+            });
+
+            services.AddDbContext<AppDbContext>(options =>
+            {
+                options.UseInMemoryDatabase(Configuration.GetConnectionString("memory"));
+            });
+
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IProjectRepository, ProjectRepository>();
+            services.AddScoped<IBugRepository, BugRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
